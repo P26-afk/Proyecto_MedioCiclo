@@ -8,16 +8,12 @@ package proyecto_mediociclo;
  *
  * @author Usuario
  */
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.ResultSet;
+import java.sql.*;
 
 public class AccesoBD {
 
     private final String host, user, contra, bd;
-    Connection conexion;
+    private Connection conexion;
 
     public AccesoBD(String host, String user, String contra, String bd) {
         this.host = host;
@@ -49,7 +45,7 @@ public class AccesoBD {
             System.out.println("Conexion establecida correctamente");
         } catch (SQLException e) {
             System.out.println("Error al conectar: " + e.getMessage());
-            throw new Exception("Problema de conexion con la base de datos");
+            throw new Exception("Problema de conexion con la base de datos", e);
         }
     }
 
