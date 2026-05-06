@@ -13,7 +13,7 @@ import java.sql.*;
 public class AccesoBD {
 
     private final String host, user, contra, bd;
-    private Connection conexion;
+    Connection conexion;
 
     public AccesoBD(String host, String user, String contra, String bd) {
         this.host = host;
