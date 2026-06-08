@@ -11,7 +11,7 @@ import java.sql.*;
  * @author crisv
  */
 public class Categoria {
-    
+
     private int idCategoria;
     private String nombre, descripcion;
     //private boolean estado;
@@ -24,8 +24,9 @@ public class Categoria {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
+
     public Categoria() throws Exception {
-        bd=new AccesoBD("localhost","root","1234","Facturacion");
+        bd = new AccesoBD("localhost", "root", "1234", "Facturacion");
         bd.conectarBD();
     }
 
@@ -45,14 +46,14 @@ public class Categoria {
         this.nombre = nombre;
     }
 
-/*    public boolean isEstado() {
+    /*    public boolean isEstado() {
         return estado;
     }
 
     public void setEstado(boolean estado) {
         this.estado = estado;
     }
-*/    
+     */
     public int obtenerSiguienteId() throws SQLException {
         int nuevoId;
         ResultSet rs = bd.consultarSQL("SELECT MAX(id_categoria) AS maximo FROM categoria");
@@ -63,6 +64,7 @@ public class Categoria {
         }
         return nuevoId;
     }
+
     public void insertarCategoria() throws SQLException {
         String sql = "INSERT INTO categoria (nombre, descripcion) VALUES (?, ?)";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
@@ -73,18 +75,19 @@ public class Categoria {
             System.out.println("Categoria agregada correctamente");
         }
     }
+
     public void actualizarCategoria() throws SQLException {
         String sql = "UPDATE categoria SET nombre=?, descripcion=? WHERE id_categoria=?";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
             pstm.setString(1, getNombre());
             pstm.setString(2, getDescripcion());
 //            pstm.setBoolean(3, isEstado());
-            pstm.setInt(4, getIdCategoria());
+            pstm.setInt(3, getIdCategoria());
             pstm.executeUpdate();
             System.out.println("Categoria actualizada correctamente");
         }
     }
-    
+
     public void eliminarCategoria() throws SQLException {
         String sql = "DELETE FROM categoria WHERE id_categoria=?";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
@@ -92,19 +95,19 @@ public class Categoria {
             pstm.executeUpdate();
             System.out.println("Categoria eliminada correctamente");
         }
-        
+
     }
- 
+
     public ResultSet consultarCategorias() throws SQLException {
-        String sql = "SELECT * FROM categoria ORDER BY nombre";   
+        String sql = "SELECT * FROM categoria ORDER BY nombre";
         return bd.consultarSQL(sql);
     }
-    
+
     public ResultSet buscarPorNombre(String nombreBuscar) throws SQLException {
         String sql = "SELECT * FROM categoria WHERE nombre LIKE '%" + nombreBuscar + "%' ORDER BY nombre";
         return bd.consultarSQL(sql);
     }
-    
+
     public boolean existeCategoria(String nombre) throws SQLException {
         String sql = "SELECT COUNT (*) as total FROM categoria WHERE nombre = '" + nombre + "'";
         ResultSet rs = bd.consultarSQL(sql);
@@ -113,5 +116,5 @@ public class Categoria {
         }
         return false;
     }
-    
+
 }

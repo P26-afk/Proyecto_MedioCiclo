@@ -5,30 +5,32 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Proveedor {
-        
-        private int idProveedor;
-        private String ruc, razonSocial, contacto, telefono, email, direccion;
-        private boolean estado;
-        AccesoBD bd;
-        
-        public Proveedor() throws Exception {
-            bd = new AccesoBD("localhost", "root","1234","Facturacion");
-            bd.conectarBD();
-            
+
+    private int idProveedor;
+    private String ruc, razonSocial, contacto, telefono, email, direccion;
+    private boolean estado;
+    AccesoBD bd;
+
+    public Proveedor() throws Exception {
+        bd = new AccesoBD("localhost", "root", "1234", "Facturacion");
+        bd.conectarBD();
+
     }
 
     public int getIdProveedor() {
         return idProveedor;
     }
-    public void setIdproveedor (int idProveedor){
+
+    public void setIdproveedor(int idProveedor) {
         this.idProveedor = idProveedor;
     }
 
     public String getRuc() {
         return ruc;
     }
-    public void setRuc (String ruc) {
-    this.ruc = ruc;
+
+    public void setRuc(String ruc) {
+        this.ruc = ruc;
     }
 
     public String getRazonSocial() {
@@ -70,13 +72,15 @@ public class Proveedor {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-    public boolean isEstado(){
+
+    public boolean isEstado() {
         return estado;
     }
+
     public void setEstado(boolean estado) {
         this.estado = estado;
     }
-    
+
     public int obtenerSiguienteId() throws SQLException {
         int nuevoId;
         ResultSet rs = bd.consultarSQL("SELECT MAX(id_proveedor) AS maximo FROM proveedor");
@@ -87,6 +91,7 @@ public class Proveedor {
         }
         return nuevoId;
     }
+
     public void insertarProveedor() throws SQLException {
         String sql = "INSERT INTO proveedor (ruc, razon_social, contacto, telefono, email, direccion, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
@@ -101,7 +106,7 @@ public class Proveedor {
             System.out.println("Proveedor registrado correctamente");
         }
     }
-   
+
     public void eleminarProveedor() throws SQLException {
         String sql = "DELETE FROM proveedor WHERE id_proveedor=?";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
@@ -110,17 +115,18 @@ public class Proveedor {
             System.out.println("Proveedor eliminado correctamente");
         }
     }
+
     public ResultSet consultarProveedores() throws SQLException {
         String sql = "SELECT * FROM proveedor ORDER BY razon_social";
         return bd.consultarSQL(sql);
     }
-    
+
     public ResultSet buscarRazonSocial(String razonBuscar) throws SQLException {
         String sql = "SELECT * FROM proveedor WHERE razon_social LIKE '%" + razonBuscar + "%' ORDER BY razon_social";
         return bd.consultarSQL(sql);
     }
-    
-    public boolean rucExiste(String rucVerificar) throws SQLException{
+
+    public boolean rucExiste(String rucVerificar) throws SQLException {
         String sql = "SELECT COUNT (*) as total FROM proveedor WHERE ruc = '" + rucVerificar + "'";
         ResultSet rs = bd.consultarSQL(sql);
         if (rs.next()) {
@@ -128,5 +134,5 @@ public class Proveedor {
         }
         return false;
     }
-    
+
 }

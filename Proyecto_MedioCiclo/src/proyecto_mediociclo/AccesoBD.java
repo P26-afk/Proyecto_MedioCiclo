@@ -20,7 +20,7 @@ public class AccesoBD {
         this.user = user;
         this.contra = contra;
         this.bd = bd;
-        
+
     }
 
     public String getHost() {
@@ -83,7 +83,7 @@ public class AccesoBD {
     public boolean estaConectado() {
         try {
             return conexion != null && !conexion.isClosed();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             return false;
         }
     }

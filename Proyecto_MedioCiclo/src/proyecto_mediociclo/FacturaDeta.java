@@ -109,13 +109,14 @@ public class FacturaDeta {
             pstm.executeUpdate();
             System.out.println("Item agregado a la factura exitosamente");
         }
-    }    
-        // Esto funciona para modificar items factura
+    }
+    // Esto funciona para modificar items factura
+
     public void actualizarDetalle() throws SQLException {
         calcularSubtotal();
-        
+
         String sql = "UPDATE detalle_factura SET id_producto=?, cantidad=?, precio_unitario=?, subtotal+? WHERE id_detalle=?";
-                try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
+        try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
             pstm.setInt(1, getIdProducto());
             pstm.setInt(2, getCantidad());
             pstm.setDouble(3, getPrecioUnitario());
@@ -218,8 +219,5 @@ public class FacturaDeta {
         } else {
             System.out.println("Error: Stock insuficiente para este producto");
         }
-    }      
+    }
 }
-    
-
-

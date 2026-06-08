@@ -47,14 +47,14 @@ public class Facturacion {
         this.numeroFactura = numeroFactura;
     }
 
-/*    public String getEstado() {
+    /*    public String getEstado() {
         return estado;
     }
 
     public void setEstado(String estado) {
         this.estado = estado;
     }
-*/
+     */
     public Date getFechaEmision() {
         return fechaEmision;
     }
