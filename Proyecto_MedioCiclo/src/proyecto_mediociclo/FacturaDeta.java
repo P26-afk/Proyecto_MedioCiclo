@@ -148,7 +148,7 @@ public class FacturaDeta {
 
     //Esto funciona para obtener el total de una factura sumando sus detelles
     public double calcularTotalFactura(int idFacturaBucar) throws SQLException {
-        String sql = "SELECT SUM(subtotal) as total FROM detalle_factura = " + idFacturaBucar;
+        String sql = "SELECT SUM(subtotal) as total FROM detalle_factura = ? " + idFacturaBucar;
         ResultSet rs = bd.consultarSQL(sql);
         if (rs.next() && rs.getObject("total") != null) {
             return rs.getDouble("total");

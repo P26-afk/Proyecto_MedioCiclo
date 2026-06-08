@@ -5,7 +5,7 @@ import java.sql.*;
 public class Facturacion {
 
     private int idFactura, idCliente, idEmpleado;
-    private String numeroFactura, estado;
+    private String numeroFactura; //estado;
     private Date fechaEmision;
     private double subtotal, descuento, iva, total;
     AccesoBD bd;
@@ -47,14 +47,14 @@ public class Facturacion {
         this.numeroFactura = numeroFactura;
     }
 
-    public String getEstado() {
+/*    public String getEstado() {
         return estado;
     }
 
     public void setEstado(String estado) {
         this.estado = estado;
     }
-
+*/
     public Date getFechaEmision() {
         return fechaEmision;
     }
@@ -115,7 +115,7 @@ public class Facturacion {
 
 //Esto funciona para crear nuevas facturas
     public void insertarFactura() throws SQLException {
-        String sql = "INSERT INTO factura (id_cliente, id_empleado, numero_factura, subtotal, descuento, iva, total, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO factura (id_cliente, id_empleado, numero_factura, subtotal, descuento, iva, total) VALUES ( ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
             pstm.setInt(1, getIdCliente());
             pstm.setInt(2, getIdEmpleado());
@@ -125,8 +125,7 @@ public class Facturacion {
             pstm.setDouble(6, getIva());
             pstm.setDouble(7, getTotal());
 //El campo estado es BOOLEAN en la BD: true = active/pagada, false = anulada
-            pstm.setBoolean(8, !"Anulada".equalsIgnoreCase(getEstado()));
-            pstm.setInt(9, getIdFactura());
+            pstm.setInt(8, getIdFactura());
             pstm.executeUpdate();
             System.out.println("Factura actualizada exitosamente");
 

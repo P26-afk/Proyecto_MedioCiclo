@@ -83,7 +83,7 @@ public class Cliente {
 
     // Inserta los clientes al sistema
     public void insertarCli() throws SQLException {
-        String sql = "INSERT INTO client (cedula, nombre, apellido, telefono, email, direccion) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cliente (cedula, nombre, apellido, telefono, email, direccion) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
             pstm.setString(1, getCI());
             pstm.setString(2, getNom());

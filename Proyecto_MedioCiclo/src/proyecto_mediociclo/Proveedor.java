@@ -111,7 +111,7 @@ public class Proveedor {
         }
     }
     public ResultSet consultarProveedores() throws SQLException {
-        String sql = "FROM proveedor ORDER BY razon_social";
+        String sql = "SELECT * FROM proveedor ORDER BY razon_social";
         return bd.consultarSQL(sql);
     }
     
