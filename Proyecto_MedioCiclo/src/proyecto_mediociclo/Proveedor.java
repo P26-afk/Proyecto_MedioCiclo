@@ -7,8 +7,8 @@ import java.sql.SQLException;
 public class Proveedor {
 
     private int idProveedor;
-    private String ruc, razonSocial, contacto, telefono, email, direccion;
-    private boolean estado;
+    private String ruc, nombre, exp, telefono, email, direccion;
+//    private boolean estado;
     AccesoBD bd;
 
     public Proveedor() throws Exception {
@@ -33,6 +33,15 @@ public class Proveedor {
         this.ruc = ruc;
     }
 
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    /*
     public String getRazonSocial() {
         return razonSocial;
     }
@@ -40,13 +49,13 @@ public class Proveedor {
     public void setRazonSocial(String razonSocial) {
         this.razonSocial = razonSocial;
     }
-
-    public String getContacto() {
-        return contacto;
+     */
+    public String getExp() {
+        return exp;
     }
 
-    public void setContacto(String contacto) {
-        this.contacto = contacto;
+    public void setExp(String exp) {
+        this.exp = exp;
     }
 
     public String getTelefono() {
@@ -73,6 +82,7 @@ public class Proveedor {
         this.direccion = direccion;
     }
 
+    /*
     public boolean isEstado() {
         return estado;
     }
@@ -80,7 +90,7 @@ public class Proveedor {
     public void setEstado(boolean estado) {
         this.estado = estado;
     }
-
+     */
     public int obtenerSiguienteId() throws SQLException {
         int nuevoId;
         ResultSet rs = bd.consultarSQL("SELECT MAX(id_proveedor) AS maximo FROM proveedor");
@@ -93,17 +103,32 @@ public class Proveedor {
     }
 
     public void insertarProveedor() throws SQLException {
-        String sql = "INSERT INTO proveedor (ruc, razon_social, contacto, telefono, email, direccion, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO proveedor (nombre,ruc, exp, telefono, email, direccion) VALUES ( ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
-            pstm.setString(1, getRuc());
-            pstm.setString(2, getRazonSocial());
-            pstm.setString(3, getContacto());
+            pstm.setString(1, getNombre());
+            pstm.setString(2, getRuc());
+            pstm.setString(3, getExp());
             pstm.setString(4, getTelefono());
             pstm.setString(5, getEmail());
             pstm.setString(6, getDireccion());
-            pstm.setBoolean(7, isEstado());
             pstm.executeUpdate();
             System.out.println("Proveedor registrado correctamente");
+        }
+    }
+
+    // Esto funciona para actualizar datos de proveedores
+    public void actualizarProveedor() throws SQLException {
+        String sql = "UPDATE proveedor SET ruc=?, nombre=?, exp=?, telefono=?, email=?, direccion=? WHERE id_proveedor=?";
+        try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
+            pstm.setString(1, getNombre());
+            pstm.setString(2, getRuc());
+            pstm.setString(3, getExp());
+            pstm.setString(4, getTelefono());
+            pstm.setString(5, getEmail());
+            pstm.setString(6, getDireccion());
+            pstm.setInt(7, getIdProveedor());
+            pstm.executeUpdate();
+            System.out.println("Proveedor actualizado correctamente");
         }
     }
 
@@ -117,12 +142,7 @@ public class Proveedor {
     }
 
     public ResultSet consultarProveedores() throws SQLException {
-        String sql = "SELECT * FROM proveedor ORDER BY razon_social";
-        return bd.consultarSQL(sql);
-    }
-
-    public ResultSet buscarRazonSocial(String razonBuscar) throws SQLException {
-        String sql = "SELECT * FROM proveedor WHERE razon_social LIKE '%" + razonBuscar + "%' ORDER BY razon_social";
+        String sql = "SELECT * FROM proveedor ORDER BY nombre";
         return bd.consultarSQL(sql);
     }
 
