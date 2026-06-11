@@ -4,19 +4,37 @@
  */
 package Interfaz;
 
+import java.awt.HeadlessException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.table.DefaultTableModel;
+import proyecto_mediociclo.Categoria;
+
 /**
  *
  * @author Usuario
  */
 public class FormCategoria extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormCategoria.class.getName());
+    private Categoria categoria;
+    private int idSeleccionado = -1;
+    private DefaultTableModel modeloTabla;
 
     /**
      * Creates new form FormCategoria
      */
     public FormCategoria() {
-        initComponents();
+
+        try {
+            initComponents();
+            setLocationRelativeTo(null);
+            configurarFormulario();
+            cargarDatos();
+        } catch (Exception e) {
+            System.err.println("Error al inicializar: " + e.getMessage());
+        }
+
     }
 
     /**
@@ -31,13 +49,13 @@ public class FormCategoria extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        TxtNombre = new javax.swing.JTextField();
+        BtnNuevo = new javax.swing.JButton();
+        BtnModificar = new javax.swing.JButton();
+        BtnEliminar = new javax.swing.JButton();
+        BtnGuardar = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        TxtDescripcion = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
 
@@ -50,17 +68,21 @@ public class FormCategoria extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel2.setText("Nombre:");
 
-        jButton1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jButton1.setText("Nuevo");
+        BtnNuevo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        BtnNuevo.setText("Nuevo");
+        BtnNuevo.addActionListener(this::BtnNuevoActionPerformed);
 
-        jButton3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jButton3.setText("Modificar");
+        BtnModificar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        BtnModificar.setText("Modificar");
+        BtnModificar.addActionListener(this::BtnModificarActionPerformed);
 
-        jButton4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jButton4.setText("Eliminar");
+        BtnEliminar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        BtnEliminar.setText("Eliminar");
+        BtnEliminar.addActionListener(this::BtnEliminarActionPerformed);
 
-        jButton2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jButton2.setText("Guardar");
+        BtnGuardar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        BtnGuardar.setText("Guardar");
+        BtnGuardar.addActionListener(this::BtnGuardarActionPerformed);
 
         jLabel3.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel3.setText("Descripcion:");
@@ -91,6 +113,11 @@ public class FormCategoria extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -111,14 +138,14 @@ public class FormCategoria extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel2)
                             .addComponent(jLabel3)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                            .addComponent(jTextField1))
+                            .addComponent(TxtDescripcion, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
+                            .addComponent(TxtNombre))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton3, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(BtnGuardar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(BtnNuevo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(BtnModificar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(BtnEliminar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(40, 40, 40))))
         );
         jPanel1Layout.setVerticalGroup(
@@ -130,24 +157,24 @@ public class FormCategoria extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(2, 2, 2)
-                        .addComponent(jButton1)
+                        .addComponent(BtnNuevo)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton2)
+                        .addComponent(BtnGuardar)
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton3)
+                            .addComponent(BtnModificar)
                             .addComponent(jLabel3)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(TxtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
-                        .addComponent(jButton4))
+                        .addComponent(BtnEliminar))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(2, 2, 2)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(TxtDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(20, 20, 20)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
                 .addGap(20, 20, 20))
@@ -172,6 +199,189 @@ public class FormCategoria extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void BtnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnNuevoActionPerformed
+        limpiarFormulario();
+        BtnGuardar.setEnabled(true);
+        TxtNombre.requestFocus();
+    }//GEN-LAST:event_BtnNuevoActionPerformed
+
+    private void BtnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnGuardarActionPerformed
+        if (!validarDatos()) {
+            return;
+        }
+        try {
+            if (categoria.existeCategoria(TxtNombre.getText().trim())) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Ya existe una categoria con ese nombre",
+                        "Categoria duplicada", javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
+
+            }
+            categoria.setNombre(TxtNombre.getText().trim());
+            categoria.setDescripcion(TxtDescripcion.getText().trim());
+
+            categoria.insertarCategoria();
+
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Categoría guardada exitosamente",
+                    "Éxito", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+            cargarDatos();
+            limpiarFormulario();
+
+        } catch (HeadlessException | SQLException e) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al guardar: " + e.getMessage(),
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+
+    }//GEN-LAST:event_BtnGuardarActionPerformed
+
+    private void BtnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnModificarActionPerformed
+        if (!validarDatos()) {
+            return;
+        }
+        if (idSeleccionado == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar una categoria para modificar",
+                    "Seleccion Requerida", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+
+        }
+        try {
+            categoria.setIdCategoria(idSeleccionado);
+            categoria.setNombre(TxtNombre.getText().trim());
+            categoria.setDescripcion(TxtDescripcion.getText().trim());
+
+            categoria.actualizarCategoria();
+
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Categoria actualizada exitosamente",
+                    "Éxito", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+            cargarDatos();
+            limpiarFormulario();
+
+        } catch (HeadlessException | SQLException e) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al actualizar: " + e.getMessage(),
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+
+    }//GEN-LAST:event_BtnModificarActionPerformed
+
+    private void BtnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnEliminarActionPerformed
+        if (idSeleccionado == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar una categoria para eliminar",
+                    "Seleccion requerida", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int respuesta = javax.swing.JOptionPane.showConfirmDialog(this,
+                "¿Esta seguro de eliminar la categoría '" + TxtNombre.getText() + "'?",
+                "Confirmar eliminacion", javax.swing.JOptionPane.YES_NO_OPTION);
+
+        if (respuesta == javax.swing.JOptionPane.YES_OPTION) {
+            try {
+                categoria.setIdCategoria(idSeleccionado);
+                categoria.eliminarCategoria();
+
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Categoria eliminada exitosamente",
+                        "Exito", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+                cargarDatos();
+                limpiarFormulario();
+
+            } catch (HeadlessException | SQLException e) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "Error al eliminar: " + e.getMessage(),
+                        "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_BtnEliminarActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        int fila = jTable1.getSelectedRow();
+        if (fila >= 0) {
+            cargarDatosSeleccionados(fila);
+        }
+    }//GEN-LAST:event_jTable1MouseClicked
+    private void configurarFormulario() {
+        // Configurar modelo de tabla
+        modeloTabla = (DefaultTableModel) jTable1.getModel();
+
+        // Configurar botones iniciales
+        BtnGuardar.setEnabled(false);
+        BtnModificar.setEnabled(false);
+        BtnEliminar.setEnabled(false);
+    }
+
+    private void cargarDatos() {
+        try {
+            modeloTabla.setRowCount(0); // Limpiar tabla
+            ResultSet rs = categoria.consultarCategorias();
+
+            while (rs.next()) {
+                Object[] fila = {
+                    rs.getInt("id_categoria"),
+                    rs.getString("nombre"),
+                    rs.getString("descripcion")
+                };
+                modeloTabla.addRow(fila);
+            }
+        } catch (SQLException e) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error al cargar datos: " + e.getMessage(),
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void limpiarFormulario() {
+        TxtNombre.setText("");
+        TxtDescripcion.setText("");
+        idSeleccionado = -1;
+
+        BtnGuardar.setEnabled(false);
+        BtnModificar.setEnabled(false);
+        BtnEliminar.setEnabled(false);
+
+        jTable1.clearSelection();
+    }
+
+    private void cargarDatosSeleccionados(int fila) {
+        if (fila >= 0) {
+            idSeleccionado = (Integer) modeloTabla.getValueAt(fila, 0);
+            TxtNombre.setText((String) modeloTabla.getValueAt(fila, 1));
+            TxtDescripcion.setText((String) modeloTabla.getValueAt(fila, 2));
+
+            BtnGuardar.setEnabled(false);
+            BtnModificar.setEnabled(true);
+            BtnEliminar.setEnabled(true);
+        }
+    }
+
+    private boolean validarDatos() {
+        if (TxtNombre.getText().trim().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Debe ingresar un nombre para la categoría",
+                    "Datos incompletos", javax.swing.JOptionPane.WARNING_MESSAGE);
+            TxtNombre.requestFocus();
+            return false;
+        }
+
+        if (TxtDescripcion.getText().trim().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Debe ingresar una descripción para la categoría",
+                    "Datos incompletos", javax.swing.JOptionPane.WARNING_MESSAGE);
+            TxtDescripcion.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * @param args the command line arguments
@@ -199,17 +409,17 @@ public class FormCategoria extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton BtnEliminar;
+    private javax.swing.JButton BtnGuardar;
+    private javax.swing.JButton BtnModificar;
+    private javax.swing.JButton BtnNuevo;
+    private javax.swing.JTextField TxtDescripcion;
+    private javax.swing.JTextField TxtNombre;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 }

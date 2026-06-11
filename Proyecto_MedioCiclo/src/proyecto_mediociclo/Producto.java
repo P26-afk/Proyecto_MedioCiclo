@@ -168,7 +168,25 @@ public class Producto {
                 + "ORDER BY p.nombre";
         return bd.consultarSQL(sql);
     }
-
+    // Esto funciona para modificar productos existentes
+    public void actualizarProducto() throws SQLException {
+        String sql = "UPDATE producto SET id_categoria=?, id_proveedor=?, codigo=?, nombre=?, descripcion=?, precio_compra=?, precio_venta=?, stock_actual=?, stock_minimo=?, stock_maximo=?, estado=? WHERE id_producto=?";
+        try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
+            pstm.setInt(1, getIdCatego());
+            pstm.setInt(2, getIdProve());
+            pstm.setString(3, getCodigo());
+            pstm.setString(4, getNombre());
+            pstm.setString(5, getDescrip());
+            pstm.setDouble(6, getPrecCompra());
+            pstm.setDouble(7, getPrecVenta());
+            pstm.setInt(8, getStockActu());
+            pstm.setInt(9, getStockMin());
+            pstm.setInt(10, getStockMax());
+            pstm.setInt(11, getIdProduct());
+            pstm.executeUpdate();
+            System.out.println("Producto actualizado exitosamente");
+        }
+    }
     public ResultSet buscarPorCategoria(int idCategoriaB) throws SQLException {
         String sql = "SELECT p.*, c.nombre as categoria, pr.razon_social as proveedor "
                 + "FROM producto p "

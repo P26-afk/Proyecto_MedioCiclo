@@ -4,19 +4,37 @@
  */
 package Interfaz;
 
+import proyecto_mediociclo.Cliente;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  *
  * @author Usuario
  */
 public class FormCliente extends javax.swing.JFrame {
     
+    Cliente cli;
+    int idSeleccionado = -1;
+    DefaultTableModel modeloTabla;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormCliente.class.getName());
 
     /**
      * Creates new form FormCliente
      */
     public FormCliente() {
-        initComponents();
+        try {
+            cli = new Cliente();
+            initComponents();
+            setLocationRelativeTo(null);
+            modeloTabla = (DefaultTableModel) TablaContenido.getModel();
+            configurarFormulario();
+            cargarDatos();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al inicializar: " + e.getMessage());
+        }
     }
 
     /**
@@ -65,9 +83,11 @@ public class FormCliente extends javax.swing.JFrame {
 
         BtnEliminar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         BtnEliminar.setText("Eliminar");
+        BtnEliminar.addActionListener(this::BtnEliminarActionPerformed);
 
         BtnBuscar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         BtnBuscar.setText("Buscar");
+        BtnBuscar.addActionListener(this::BtnBuscarActionPerformed);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -204,6 +224,11 @@ public class FormCliente extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
+        TablaContenido.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                TablaContenidoMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(TablaContenido);
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -247,11 +272,11 @@ public class FormCliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void BtnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnAgregarActionPerformed
-        // TODO add your handling code here:
+        agregarCliente();
     }//GEN-LAST:event_BtnAgregarActionPerformed
 
     private void BtnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnActualizarActionPerformed
-        // TODO add your handling code here:
+        actualizarCliente();
     }//GEN-LAST:event_BtnActualizarActionPerformed
 
     private void NombreTextoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NombreTextoActionPerformed
@@ -277,6 +302,249 @@ public class FormCliente extends javax.swing.JFrame {
     private void DireccionTextoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DireccionTextoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_DireccionTextoActionPerformed
+
+    private void BtnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnEliminarActionPerformed
+        eliminarCliente();
+    }//GEN-LAST:event_BtnEliminarActionPerformed
+
+    private void BtnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnBuscarActionPerformed
+        buscarCliente();
+    }//GEN-LAST:event_BtnBuscarActionPerformed
+
+    private void TablaContenidoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaContenidoMouseClicked
+        int fila = TablaContenido.getSelectedRow();
+        if (fila >= 0) {
+            cargarDatosSeleccionados(fila);
+            
+        }
+    }//GEN-LAST:event_TablaContenidoMouseClicked
+
+    // Metodo para configurar el formulario
+    private void configurarFormulario() {
+        // El formulario ya esta configurado en initComponents()
+        // Solo cargamos los datos iniciales
+        inicializarDatos();
+    }
+
+    // Esto funciona para inicializar los datos necesarios
+    private void inicializarDatos() {
+        cargarDatos();
+    }
+
+    // Esto funciona para cargar datos en la tabla
+    private void cargarDatos() {
+        try {
+            modeloTabla.setRowCount(0);
+            ResultSet rs = cli.consuCli();
+            
+            while (rs.next()) {
+                Object[] fila = {
+                    rs.getInt("id_cliente"),
+                    rs.getString("cedula"),
+                    rs.getString("nombres"),
+                    rs.getString("apellidos"),
+                    rs.getString("telefono"),
+                    rs.getString("email"),
+                    rs.getString("direccion")
+                };
+                modeloTabla.addRow(fila);
+            }
+        } catch (SQLException e) {
+            mostrarError("Error al cargar datos: " + e.getMessage());
+        }
+    }
+
+    // Esto funciona para cargar datos del registro seleccionado
+    private void cargarDatosSeleccionados(int fila) {
+        idSeleccionado = (int) modeloTabla.getValueAt(fila, 0);
+        CedulaTexto.setText((String) modeloTabla.getValueAt(fila, 1));
+        NombreTexto.setText((String) modeloTabla.getValueAt(fila, 2));
+        ApellidoTexto.setText((String) modeloTabla.getValueAt(fila, 3));
+        TelfTexto.setText((String) modeloTabla.getValueAt(fila, 4));
+        CorreoTexto.setText((String) modeloTabla.getValueAt(fila, 5));
+        DireccionTexto.setText((String) modeloTabla.getValueAt(fila, 6));
+    }
+
+    // Esto funciona para agregar nuevo cliente
+    private void agregarCliente() {
+        if (!validarDatos()) {
+            return;
+        }
+        
+        try {
+            if (cli.CIexis(CedulaTexto.getText())) {
+                mostrarError("Esta cedula ya esta registrada en el sistema.");
+                return;
+            }
+            
+            cli.setCI(CedulaTexto.getText());
+            cli.setNom(NombreTexto.getText());
+            cli.setApe(ApellidoTexto.getText());
+            cli.setTelf(TelfTexto.getText());
+            cli.setEmail(CorreoTexto.getText());
+            cli.setDirec(DireccionTexto.getText());
+            
+            cli.insertarCli();
+            mostrarMensaje("Cliente agregado correctamente");
+            cargarDatos();
+            limpiarFormulario();
+        } catch (Exception e) {
+            mostrarError("Error al agregar cliente: " + e.getMessage());
+        }
+    }
+
+    // Esto funciona para actualizar cliente existente
+    private void actualizarCliente() {
+        if (idSeleccionado == -1) {
+            mostrarError("Seleccione un cliente para actualizar");
+            return;
+        }
+        
+        if (!validarDatos()) {
+            return;
+        }
+        
+        try {
+            cli.setIdCliente(idSeleccionado);
+            cli.setCI(CedulaTexto.getText());
+            cli.setNom(NombreTexto.getText());
+            cli.setApe(ApellidoTexto.getText());
+            cli.setTelf(TelfTexto.getText());
+            cli.setEmail(CorreoTexto.getText());
+            cli.setDirec(DireccionTexto.getText());
+            
+            cli.actualizarCli();
+            mostrarMensaje("Cliente actualizado correctamente");
+            cargarDatos();
+            limpiarFormulario();
+        } catch (SQLException e) {
+            mostrarError("Error al actualizar cliente: " + e.getMessage());
+        }
+    }
+
+    // Esto funciona para eliminar cliente
+    private void eliminarCliente() {
+        if (idSeleccionado == -1) {
+            mostrarError("Seleccione un cliente para eliminar");
+            return;
+        }
+        
+        int respuesta = JOptionPane.showConfirmDialog(this,
+                "Esta seguro de eliminar este cliente?",
+                "Confirmar eliminacion",
+                JOptionPane.YES_NO_OPTION);
+        
+        if (respuesta == JOptionPane.YES_OPTION) {
+            try {
+                cli.setIdCliente(idSeleccionado);
+                cli.eliminarCli();
+                mostrarMensaje("Cliente eliminado correctamente");
+                cargarDatos();
+                limpiarFormulario();
+            } catch (SQLException e) {
+                mostrarError("Error al eliminar cliente: " + e.getMessage());
+            }
+        }
+    }
+
+    // Esto funciona para buscar cliente
+    private void buscarCliente() {
+        String cedula = JOptionPane.showInputDialog(this, "Ingrese la cedula a buscar:");
+        if (cedula != null && !cedula.trim().isEmpty()) {
+            try {
+                modeloTabla.setRowCount(0);
+                ResultSet rs = cli.buscaCI(cedula);
+                
+                while (rs.next()) {
+                    Object[] fila = {
+                        rs.getInt("id_cliente"),
+                        rs.getString("cedula"),
+                        rs.getString("nombres"),
+                        rs.getString("apellidos"),
+                        rs.getString("telefono"),
+                        rs.getString("email"),
+                        rs.getString("direccion")
+                    };
+                    modeloTabla.addRow(fila);
+                }
+                
+                if (modeloTabla.getRowCount() == 0) {
+                    mostrarMensaje("No se encontraron clientes con esa cedula");
+                    cargarDatos();
+                }
+            } catch (SQLException e) {
+                mostrarError("Error al buscar: " + e.getMessage());
+            }
+        }
+    }
+
+    // Buscar en tiempo real
+    private void buscar(String texto) {
+        try {
+            modeloTabla.setRowCount(0);
+            ResultSet rs = cli.buscaCI(texto);
+            
+            while (rs.next()) {
+                Object[] fila = {
+                    rs.getInt("id_cliente"),
+                    rs.getString("cedula"),
+                    rs.getString("nombres"),
+                    rs.getString("apellidos"),
+                    rs.getString("telefono"),
+                    rs.getString("email"),
+                    rs.getString("direccion")
+                };
+                modeloTabla.addRow(fila);
+            }
+        } catch (SQLException e) {
+            mostrarError("Error al buscar: " + e.getMessage());
+        }
+    }
+
+    // Esto funciona para limpiar el formulario
+    private void limpiarFormulario() {
+        CedulaTexto.setText("");
+        NombreTexto.setText("");
+        ApellidoTexto.setText("");
+        TelfTexto.setText("");
+        CorreoTexto.setText("");
+        DireccionTexto.setText("");
+        idSeleccionado = -1;
+        TablaContenido.clearSelection();
+    }
+
+    // Esto funciona para validar los datos del formulario
+    private boolean validarDatos() {
+        if (CedulaTexto.getText().trim().isEmpty()) {
+            mostrarError("La cedula es requerida");
+            CedulaTexto.requestFocus();
+            return false;
+        }
+        
+        if (NombreTexto.getText().trim().isEmpty()) {
+            mostrarError("Los nombres son requeridos");
+            NombreTexto.requestFocus();
+            return false;
+        }
+        
+        if (ApellidoTexto.getText().trim().isEmpty()) {
+            mostrarError("Los apellidos son requeridos");
+            ApellidoTexto.requestFocus();
+            return false;
+        }
+        
+        return true;
+    }
+
+    // Esto funciona para mostrar mensajes de informacion
+    private void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Informacion", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // Esto funciona para mostrar mensajes de error
+    private void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
 
     /**
      * @param args the command line arguments

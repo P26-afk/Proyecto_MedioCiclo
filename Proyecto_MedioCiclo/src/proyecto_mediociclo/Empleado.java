@@ -5,7 +5,7 @@ import java.sql.*;
 
 public class Empleado {
 
-    private int ci, telf;
+    private int ci, telf, idEmpleado;
     private String nom, ape, cargo, dire, correo;
     private Date fechContra;
     private double sueldo;
@@ -163,5 +163,13 @@ public class Empleado {
     public ResultSet buscarPorCedula(String cedula) throws SQLException {
         String sql = "SELECT * FROM empleado WHERE cedula = '" + cedula + "'";
         return bd.consultarSQL(sql);
+    }
+
+    public int getIdEmpleado() {
+        return idEmpleado;
+    }
+
+    public void setIdEmpleado(int idEmpleado) {
+        this.idEmpleado = idEmpleado;
     }
 }

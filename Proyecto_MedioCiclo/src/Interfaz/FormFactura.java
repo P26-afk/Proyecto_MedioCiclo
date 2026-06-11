@@ -17,6 +17,7 @@ public class FormFactura extends javax.swing.JFrame {
      */
     public FormFactura() {
         initComponents();
+        setLocationRelativeTo(null);
     }
 
     /**
