@@ -5,7 +5,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
 package proyecto_mediociclo;
-
+import Interfaz.FormBase;
 /**
  *
  * @author Usuario
@@ -16,7 +16,8 @@ public class Proyecto_MedioCiclo {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        FormBase fc = new FormBase();
+        fc.setVisible(true);
     }
       
 }

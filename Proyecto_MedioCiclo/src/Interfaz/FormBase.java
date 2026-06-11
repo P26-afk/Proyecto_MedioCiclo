@@ -49,6 +49,7 @@ public class FormBase extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Menu Principal");
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         TextoMenu.setFont(new java.awt.Font("Press Start 2P", 1, 18)); // NOI18N
         TextoMenu.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -66,8 +67,10 @@ public class FormBase extends javax.swing.JFrame {
         Empleados.addActionListener(this::EmpleadosActionPerformed);
 
         Clientes.setText("Clientes");
+        Clientes.addActionListener(this::ClientesActionPerformed);
 
         Facturas.setText("Facturas");
+        Facturas.addActionListener(this::FacturasActionPerformed);
 
         Busquedas.setText("Consultar");
         Busquedas.addActionListener(this::BusquedasActionPerformed);
@@ -77,6 +80,7 @@ public class FormBase extends javax.swing.JFrame {
         Proveedores.setText("Proveedores");
 
         Categorias.setText("Categorias");
+        Categorias.addActionListener(this::CategoriasActionPerformed);
 
         jLabel1.setFont(new java.awt.Font("Verdana", 2, 12)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(153, 153, 153));
@@ -206,6 +210,18 @@ public class FormBase extends javax.swing.JFrame {
     private void ProductosFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_ProductosFocusGained
         // TODO add your handling code here:
     }//GEN-LAST:event_ProductosFocusGained
+
+    private void ClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ClientesActionPerformed
+        new FormCliente().setVisible(true);
+    }//GEN-LAST:event_ClientesActionPerformed
+
+    private void CategoriasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CategoriasActionPerformed
+        new FormCategoria().setVisible(true);
+    }//GEN-LAST:event_CategoriasActionPerformed
+
+    private void FacturasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FacturasActionPerformed
+        new FormFactura().setVisible(true);
+    }//GEN-LAST:event_FacturasActionPerformed
 
     /**
      * @param args the command line arguments
