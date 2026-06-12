@@ -27,6 +27,7 @@ public class FormCategoria extends javax.swing.JFrame {
     public FormCategoria() {
 
         try {
+            categoria = new Categoria();
             initComponents();
             setLocationRelativeTo(null);
             configurarFormulario();
