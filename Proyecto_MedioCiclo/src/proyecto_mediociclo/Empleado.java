@@ -6,7 +6,7 @@ import java.sql.*;
 public class Empleado {
 
     private int idEmpleado;
-    private String nom, ape, cargo, dire, correo,ci, telf;
+    private String nom, ape, cargo, dire, correo, ci, telf;
     private Date fechContra;
     private double sueldo;
     AccesoBD bd;
@@ -173,7 +173,8 @@ public class Empleado {
         this.idEmpleado = idEmpleado;
     }
 
-    public ResultSet listarActivos() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public ResultSet listarActivos() throws SQLException {
+        String sql = "SELECT * FROM empleado ORDER BY apellidos, nombres";
+        return bd.consultarSQL(sql);
     }
 }

@@ -125,7 +125,6 @@ public class Facturacion {
             pstm.setDouble(6, getIva());
             pstm.setDouble(7, getTotal());
 //El campo estado es BOOLEAN en la BD: true = active/pagada, false = anulada
-            pstm.setInt(8, getIdFactura());
             pstm.executeUpdate();
             System.out.println("Factura actualizada exitosamente");
 

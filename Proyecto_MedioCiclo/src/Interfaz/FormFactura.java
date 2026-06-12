@@ -319,6 +319,7 @@ public class FormFactura extends javax.swing.JFrame {
 
         BtnImprimir.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         BtnImprimir.setText("Imprimir Factura");
+        BtnImprimir.addActionListener(this::BtnImprimirActionPerformed);
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel11.setText("FACTURACION");
@@ -416,6 +417,14 @@ public class FormFactura extends javax.swing.JFrame {
             actualizarSubtotalProducto();
         }
     }//GEN-LAST:event_TablaContenidoPropertyChange
+
+    private void BtnImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnImprimirActionPerformed
+        try {
+            generarPDFFactura();
+        } catch (Exception ex) {
+            Logger.getLogger(FormFactura.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_BtnImprimirActionPerformed
 
     private void configurarTablaProductos() {
         modeloProductos = (DefaultTableModel) TablaContenido.getModel();
@@ -618,8 +627,6 @@ public class FormFactura extends javax.swing.JFrame {
             if (opcion == JOptionPane.OK_OPTION && tabla.getSelectedRow() != -1) {
                 int fila = tabla.getSelectedRow();
                 idEmpleadoSeleccionado = (int) modelo.getValueAt(fila, 0);
-                String nombres = (String) modelo.getValueAt(fila, 2);
-                String apellidos = (String) modelo.getValueAt(fila, 3);
 
                 TxtIDEmpleado.setText(String.valueOf(idEmpleadoSeleccionado));
                 // Si tuvieras un campo txtNombreEmpleado, podrías poner el nombre aquí
@@ -805,7 +812,7 @@ public class FormFactura extends javax.swing.JFrame {
         idEmpleadoSeleccionado = 0;
     }
 
-    private void guardarFactura() {
+/*    private void guardarFactura() {
         try {
             if (validarCampos()) {
                 // TODO: Implementar guardado en base de datos
@@ -853,7 +860,7 @@ public class FormFactura extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Seleccione una factura para eliminar");
         }
     }
-
+*/
     private boolean validarCampos() {
         if (TxtCedulaCli.getText().isEmpty()
                 || TxtNomCliente.getText().isEmpty()

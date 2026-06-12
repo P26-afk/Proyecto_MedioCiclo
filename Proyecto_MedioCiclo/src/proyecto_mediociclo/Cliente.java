@@ -150,7 +150,7 @@ public class Cliente {
         return bd.consultarSQL(sql);
     }
 
-    public ResultSet listarActivos() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    public ResultSet listarActivos() throws SQLException {
+        String sql = "SELECT * FROM cliente ORDER BY apellidos, nombres";
+        return bd.consultarSQL(sql);    }
 }
