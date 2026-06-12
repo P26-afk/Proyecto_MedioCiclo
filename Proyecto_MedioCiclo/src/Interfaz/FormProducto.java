@@ -26,6 +26,8 @@ public class FormProducto extends javax.swing.JFrame {
     public FormProducto() {
         initComponents();
         setLocationRelativeTo(null);
+        mostrarProductos();
+        cargarCombos();
     }
 
     /**
@@ -59,9 +61,9 @@ public class FormProducto extends javax.swing.JFrame {
         TxtStockA = new javax.swing.JTextField();
         TxtStockM = new javax.swing.JTextField();
         TxtStockMa = new javax.swing.JTextField();
-        TxtIdCatego = new javax.swing.JTextField();
-        TxtIdProvee = new javax.swing.JTextField();
         TxtBuscar = new javax.swing.JTextField();
+        CboCategoria = new javax.swing.JComboBox<>();
+        CboProveedor = new javax.swing.JComboBox<>();
         jPanel2 = new javax.swing.JPanel();
         BtnActualizar = new javax.swing.JButton();
         BtnEliminar = new javax.swing.JButton();
@@ -116,6 +118,10 @@ public class FormProducto extends javax.swing.JFrame {
             }
         });
 
+        CboCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        CboProveedor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -145,10 +151,10 @@ public class FormProducto extends javax.swing.JFrame {
                     .addComponent(TxtStockA)
                     .addComponent(TxtStockM)
                     .addComponent(TxtStockMa)
-                    .addComponent(TxtIdCatego)
-                    .addComponent(TxtIdProvee)
                     .addComponent(TxtBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
-                    .addComponent(TxtProducto))
+                    .addComponent(TxtProducto)
+                    .addComponent(CboCategoria, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(CboProveedor, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -191,13 +197,13 @@ public class FormProducto extends javax.swing.JFrame {
                     .addComponent(jLabel9)
                     .addComponent(TxtStockMa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
-                    .addComponent(TxtIdCatego, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(CboCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(14, 14, 14)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
-                    .addComponent(TxtIdProvee, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(CboProveedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
@@ -362,8 +368,13 @@ public class FormProducto extends javax.swing.JFrame {
         TxtStockA.setText("0");
         TxtStockM.setText("0");
         TxtStockMa.setText("0");
-        TxtIdCatego.setText("");
-        TxtIdProvee.setText("");
+
+        if (CboCategoria.getItemCount() > 0) {
+            CboCategoria.setSelectedIndex(0);
+        }
+        if (CboProveedor.getItemCount() > 0) {
+            CboProveedor.setSelectedIndex(0);
+        }
     }
 
     private void guardarProducto() throws SQLException, Exception {
@@ -371,8 +382,15 @@ public class FormProducto extends javax.swing.JFrame {
             if (validarCampos()) {
                 Producto producto = new Producto();
                 producto.setIdProduct(Integer.parseInt(TxtProducto.getText()));
-                producto.setIdCatego(Integer.parseInt(TxtIdCatego.getText()));
-                producto.setIdProve(Integer.parseInt(TxtIdProvee.getText()));
+
+                String comboCat = CboCategoria.getSelectedItem().toString();
+                int idCat = Integer.parseInt(comboCat.split(" - ")[0]);
+                producto.setIdCatego(idCat);
+
+                String comboProv = CboProveedor.getSelectedItem().toString();
+                int idProv = Integer.parseInt(comboProv.split(" - ")[0]);
+                producto.setIdProve(idProv);
+
                 producto.setCodigo(TxtCodigo.getText());
                 producto.setNombre(TxtNombre.getText());
                 producto.setDescrip(TxtDescri.getText());
@@ -397,8 +415,12 @@ public class FormProducto extends javax.swing.JFrame {
             if (validarCampos() && !TxtProducto.getText().isEmpty()) {
                 Producto producto = new Producto();
                 producto.setIdProduct(Integer.parseInt(TxtProducto.getText()));
-                producto.setIdCatego(Integer.parseInt(TxtIdCatego.getText()));
-                producto.setIdProve(Integer.parseInt(TxtIdProvee.getText()));
+                String comboCat = CboCategoria.getSelectedItem().toString();
+                int idCat = Integer.parseInt(comboCat.split(" - ")[0]);
+                producto.setIdCatego(idCat);
+                String comboProv = CboProveedor.getSelectedItem().toString();
+                int idProv = Integer.parseInt(comboProv.split(" - ")[0]);
+                producto.setIdProve(idProv);
                 producto.setCodigo(TxtCodigo.getText());
                 producto.setNombre(TxtNombre.getText());
                 producto.setDescrip(TxtDescri.getText());
@@ -419,7 +441,7 @@ public class FormProducto extends javax.swing.JFrame {
     }
 
     private void eliminarProducto() {
-        if (!TxtCodigo.getText().isEmpty()) {
+        if (!TxtProducto.getText().isEmpty()) {
             int confirm = JOptionPane.showConfirmDialog(this,
                     "¿Está seguro de eliminar este producto?",
                     "Confirmar eliminación",
@@ -428,7 +450,7 @@ public class FormProducto extends javax.swing.JFrame {
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
                     Producto producto = new Producto();
-                    producto.setIdProduct(Integer.parseInt(TxtCodigo.getText()));
+                    producto.setIdProduct(Integer.parseInt(TxtProducto.getText()));
                     producto.eliminarProduct();
                     JOptionPane.showMessageDialog(this, "Producto eliminado exitosamente");
                     mostrarProductos();
@@ -438,7 +460,7 @@ public class FormProducto extends javax.swing.JFrame {
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(this, "Seleccione un producto para eliminar");
+            JOptionPane.showMessageDialog(this, "Seleccione un producto de la tabla para eliminar");
         }
     }
 
@@ -471,8 +493,7 @@ public class FormProducto extends javax.swing.JFrame {
                     rs.getString("descripcion"),
                     rs.getDouble("precio_compra"),
                     rs.getDouble("precio_venta"),
-                    rs.getInt("stock_actual"),
-                    rs.getBoolean("estado") ? "Activo" : "Inactivo"
+                    rs.getInt("stock_actual")
                 };
                 modelo.addRow(fila);
             }
@@ -498,8 +519,7 @@ public class FormProducto extends javax.swing.JFrame {
                         rs.getString("descripcion"),
                         rs.getDouble("precio_compra"),
                         rs.getDouble("precio_venta"),
-                        rs.getInt("stock_actual"),
-                        rs.getBoolean("estado") ? "Activo" : "Inactivo"
+                        rs.getInt("stock_actual")
                     };
                     modelo.addRow(fila);
                 }
@@ -514,17 +534,17 @@ public class FormProducto extends javax.swing.JFrame {
     private boolean validarCampos() {
         if (TxtProducto.getText().isEmpty()
                 || TxtCodigo.getText().isEmpty()
-                || TxtNombre.getText().isEmpty()
-                || TxtIdCatego.getText().isEmpty()
-                || TxtIdProvee.getText().isEmpty()) {
+                || TxtNombre.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Complete todos los campos obligatorios");
             return false;
         }
 
+        if (CboCategoria.getSelectedIndex() <= 0 || CboProveedor.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar una Categoría y un Proveedor de la lista");
+            return false;
+        }
         try {
             Integer.valueOf(TxtProducto.getText());
-            Integer.valueOf(TxtIdCatego.getText());
-            Integer.valueOf(TxtIdProvee.getText());
             Double.valueOf(TxtPreCom.getText());
             Double.valueOf(TxtVenta.getText());
             Integer.valueOf(TxtStockA.getText());
@@ -536,6 +556,35 @@ public class FormProducto extends javax.swing.JFrame {
         }
 
         return true;
+    }
+
+    private void cargarCombos() {
+        try {
+            Producto producto = new Producto();
+
+            // 1. Cargar el ComboBox de Categorías
+            CboCategoria.removeAllItems(); // Asegura que esté limpio
+            CboCategoria.addItem("Seleccione una Categoría..."); // Opción por defecto (Índice 0)
+
+            ResultSet rsCat = producto.listarCategorias();
+            while (rsCat.next()) {
+                // Guardamos en formato "ID - Nombre" (Ej: "1 - Bebidas")
+                CboCategoria.addItem(rsCat.getInt("id_categoria") + " - " + rsCat.getString("nombre"));
+            }
+
+            // 2. Cargar el ComboBox de Proveedores
+            CboProveedor.removeAllItems();
+            CboProveedor.addItem("Seleccione un Proveedor..."); // Opción por defecto (Índice 0)
+
+            ResultSet rsProv = producto.listarProveedores();
+            while (rsProv.next()) {
+                // Guardamos en formato "ID - Nombre" (Ej: "5 - Distribuidora Alfa")
+                CboProveedor.addItem(rsProv.getInt("id_proveedor") + " - " + rsProv.getString("nombre"));
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar los ComboBox: " + e.getMessage());
+        }
     }
 
     /**
@@ -568,12 +617,12 @@ public class FormProducto extends javax.swing.JFrame {
     private javax.swing.JButton BtnEliminar;
     private javax.swing.JButton BtnGuardar;
     private javax.swing.JButton BtnNuevo;
+    private javax.swing.JComboBox<String> CboCategoria;
+    private javax.swing.JComboBox<String> CboProveedor;
     private javax.swing.JTable TablaContenido;
     private javax.swing.JTextField TxtBuscar;
     private javax.swing.JTextField TxtCodigo;
     private javax.swing.JTextField TxtDescri;
-    private javax.swing.JTextField TxtIdCatego;
-    private javax.swing.JTextField TxtIdProvee;
     private javax.swing.JTextField TxtNombre;
     private javax.swing.JTextField TxtPreCom;
     private javax.swing.JTextField TxtProducto;

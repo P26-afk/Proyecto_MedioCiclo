@@ -83,14 +83,14 @@ public class Cliente {
 
     // Inserta los clientes al sistema
     public void insertarCli() throws SQLException {
-        String sql = "INSERT INTO cliente (cedula, nombre, apellido, telefono, email, direccion) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cliente (cedula, nombres, apellidos, telefono, email, direccion) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
             pstm.setString(1, getCI());
             pstm.setString(2, getNom());
             pstm.setString(3, getApe());
             pstm.setString(4, getTelf());
-            pstm.setString(5, getDirec());
-            pstm.setString(6, getEmail());
+            pstm.setString(5, getEmail());
+            pstm.setString(6, getDirec());
             pstm.executeUpdate();
             System.out.println("Cliente Registrado en la base de datos con Exito");
         }
@@ -98,14 +98,14 @@ public class Cliente {
 
     //Actualiza la informacion del cliente
     public void actualizarCli() throws SQLException {
-        String sql = "UPDATE cliente SET cedula=?, nombre=?, apellido=?, telefono=?, email=?, direccion=? WHERE id_cliente=?";
+        String sql = "UPDATE cliente SET cedula=?, nombres=?, apellidos=?, telefono=?, email=?, direccion=? WHERE id_cliente=?";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
             pstm.setString(1, getCI());
             pstm.setString(2, getNom());
             pstm.setString(3, getApe());
             pstm.setString(4, getTelf());
-            pstm.setString(5, getDirec());
-            pstm.setString(6, getEmail());
+            pstm.setString(5, getEmail());
+            pstm.setString(6, getDirec());
             pstm.executeUpdate();
             System.out.println("Datos del Cliente actualizados");
         }
@@ -148,5 +148,9 @@ public class Cliente {
     public ResultSet buscId(int id) throws SQLException {
         String sql = "SELECT * FROM cliente WHERE id_cliente = " + id;
         return bd.consultarSQL(sql);
+    }
+
+    public ResultSet listarActivos() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

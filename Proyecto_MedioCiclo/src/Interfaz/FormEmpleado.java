@@ -204,15 +204,23 @@ public class FormEmpleado extends javax.swing.JFrame {
 
         TablaContenido.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Cedula", "Apellido", "Cargo", "Salario", "Telefono"
+                "ID", "Cedula", "Nombre", "Apellido", "Cargo", "Salario", "Telefono"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, true, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         TablaContenido.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 TablaContenidoMouseClicked(evt);
@@ -259,8 +267,6 @@ public class FormEmpleado extends javax.swing.JFrame {
                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
-
-        jPanel1.getAccessibleContext().setAccessibleName("Datos del Empleado");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -323,12 +329,12 @@ public class FormEmpleado extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Esta cédula ya está registrada");
                 return;
             }
-            empleado.setCi(Integer.parseInt(TxtCedula.getText()));
+            empleado.setCi(TxtCedula.getText().trim());
             empleado.setNom(TxtNombre.getText().trim());
             empleado.setApe(TxtApe.getText().trim());
             empleado.setCargo((String) CmbCargo.getSelectedItem());
             empleado.setSueldo(Double.parseDouble(TxtSalario.getText().trim()));
-            empleado.setTelf(Integer.parseInt(TxtTelf.getText()));
+            empleado.setTelf(TxtTelf.getText().trim());
             empleado.insertarEmpleado();
             JOptionPane.showMessageDialog(this, "Empleado guardado correctamente");
             cargarTabla();
@@ -374,19 +380,19 @@ public class FormEmpleado extends javax.swing.JFrame {
         }
         try {
             empleado.setIdEmpleado(idSeleccionado);
-            empleado.setCi(Integer.parseInt(TxtCedula.getText()));
+            empleado.setCi(TxtCedula.getText().trim());
             empleado.setNom(TxtNombre.getText().trim());
             empleado.setApe(TxtApe.getText().trim());
             empleado.setCargo((String) CmbCargo.getSelectedItem());
             empleado.setSueldo(Double.parseDouble(TxtSalario.getText().trim()));
-            empleado.setTelf(Integer.parseInt(TxtTelf.getText()));
+            empleado.setTelf(TxtTelf.getText().trim());
             empleado.actualizarEmpleados();
             JOptionPane.showMessageDialog(this, "Empleado actualizado correctamente");
             cargarTabla();
             nuevo();
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "El salario debe ser un número válido");
-        } catch (Exception e) {
+        } catch (HeadlessException | SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al actualizar: " + e.getMessage());
         }
     }
@@ -407,7 +413,6 @@ public class FormEmpleado extends javax.swing.JFrame {
                         rs.getString("cargo"),
                         rs.getDouble("salario"),
                         rs.getString("telefono"),
-                        rs.getBoolean("estado") ? "Activo" : "Inactivo"
                     };
                     modelo.addRow(fila);
                 }
@@ -454,7 +459,6 @@ public class FormEmpleado extends javax.swing.JFrame {
                     rs.getString("cargo"),
                     rs.getDouble("salario"),
                     rs.getString("telefono"),
-                    rs.getBoolean("estado") ? "Activo" : "Inactivo"
                 };
                 modelo.addRow(fila);
             }

@@ -125,7 +125,7 @@ public class Producto {
     }
      */
     public void insertProduct() throws SQLException {
-        String sql = "INSERT INTO producto (id_categoria, id_proveedor, codigo, nombre, descripcion, precio_compra, precio_venta, stock_actual, stock_minimo, stock_maximo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO producto (id_categoria, id_proveedor, codigo, nombre, descripcion, precio_compra, precio_venta, stock_actual, stock_minimo, stock_maximo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
             pstm.setInt(1, getIdCatego());
             pstm.setInt(2, getIdProve());
@@ -138,6 +138,9 @@ public class Producto {
             pstm.setInt(9, getStockMin());
             pstm.setInt(10, getStockMax());
             pstm.setInt(11, getIdProduct());
+
+            pstm.executeUpdate();
+            System.out.println("Producto registrado con éxito");
         }
     }
 
@@ -151,7 +154,7 @@ public class Producto {
     }
 
     public ResultSet consultarProduct() throws SQLException {
-        String sql = "SELECT p.*, c.nombre as categoria, pr.razon_social as proveedor "
+        String sql = "SELECT p.*, c.nombre as categoria, pr.nombre as proveedor "
                 + "FROM producto p "
                 + "INNER JOIN categoria c ON p.id_categoria = c.id_categoria "
                 + "INNER JOIN proveedor pr ON p.id_proveedor = pr.id_proveedor "
@@ -160,7 +163,7 @@ public class Producto {
     }
 
     public ResultSet buscarPorNom(String nombre) throws SQLException {
-        String sql = "SELECT p.*, c.nombre as categoria, pr.razon_social as proveedor "
+        String sql = "SELECT p.*, c.nombre as categoria, pr.nombre as proveedor "
                 + "FROM producto p "
                 + "INNER JOIN categoria c ON p.id_categoria = c.id_categoria "
                 + "INNER JOIN proveedor pr ON p.id_proveedor = pr.id_proveedor "
@@ -168,9 +171,10 @@ public class Producto {
                 + "ORDER BY p.nombre";
         return bd.consultarSQL(sql);
     }
+
     // Esto funciona para modificar productos existentes
     public void actualizarProducto() throws SQLException {
-        String sql = "UPDATE producto SET id_categoria=?, id_proveedor=?, codigo=?, nombre=?, descripcion=?, precio_compra=?, precio_venta=?, stock_actual=?, stock_minimo=?, stock_maximo=?, estado=? WHERE id_producto=?";
+        String sql = "UPDATE producto SET id_categoria=?, id_proveedor=?, codigo=?, nombre=?, descripcion=?, precio_compra=?, precio_venta=?, stock_actual=?, stock_minimo=?, stock_maximo=? WHERE id_producto=?";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
             pstm.setInt(1, getIdCatego());
             pstm.setInt(2, getIdProve());
@@ -187,8 +191,9 @@ public class Producto {
             System.out.println("Producto actualizado exitosamente");
         }
     }
+
     public ResultSet buscarPorCategoria(int idCategoriaB) throws SQLException {
-        String sql = "SELECT p.*, c.nombre as categoria, pr.razon_social as proveedor "
+        String sql = "SELECT p.*, c.nombre as categoria, pr.nombre as proveedor "
                 + "FROM producto p "
                 + "INNER JOIN categoria c ON p.id_categoria = c.id_categoria "
                 + "INNER JOIN proveedor pr ON p.id_proveedor = pr.id_proveedor "
@@ -234,4 +239,15 @@ public class Producto {
         String sql = "SELECT * From producto WHERE id_producto= " + id;
         return bd.consultarSQL(sql);
     }
+
+    public ResultSet listarCategorias() throws SQLException {
+        String sql = "SELECT id_categoria, nombre FROM categoria ORDER BY nombre";
+        return bd.consultarSQL(sql);
+    }
+
+    public ResultSet listarProveedores() throws SQLException {
+        String sql = "SELECT id_proveedor, nombre FROM proveedor ORDER BY nombre";
+        return bd.consultarSQL(sql);
+    }
+    
 }

@@ -5,8 +5,8 @@ import java.sql.*;
 
 public class Empleado {
 
-    private int ci, telf, idEmpleado;
-    private String nom, ape, cargo, dire, correo;
+    private int idEmpleado;
+    private String nom, ape, cargo, dire, correo,ci, telf;
     private Date fechContra;
     private double sueldo;
     AccesoBD bd;
@@ -16,19 +16,19 @@ public class Empleado {
         bd.conectarBD();
     }
 
-    public int getCi() {
+    public String getCi() {
         return ci;
     }
 
-    public void setCi(int ci) {
+    public void setCi(String ci) {
         this.ci = ci;
     }
 
-    public int getTelf() {
+    public String getTelf() {
         return telf;
     }
 
-    public void setTelf(int telf) {
+    public void setTelf(String telf) {
         this.telf = telf;
     }
 
@@ -93,13 +93,13 @@ public class Empleado {
     }
 
     public void insertarEmpleado() throws SQLException {
-        String sql = "INSERT INTO empleado (cedula, nombres, apellidos, cargo, telefono, email, direccion, salario) VALUES(?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO empleado (cedula, nombres, apellidos, cargo, telefono, email, direccion, salario) VALUES(?,?,?,?,?,?,?,?)";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
-            pstm.setInt(1, getCi());
+            pstm.setString(1, getCi());
             pstm.setString(2, getNom());
             pstm.setString(3, getApe());
             pstm.setString(4, getCargo());
-            pstm.setInt(5, getTelf());
+            pstm.setString(5, getTelf());
             pstm.setString(6, getCorreo());
             pstm.setString(7, getDire());
             pstm.setDouble(8, getSueldo());
@@ -112,11 +112,11 @@ public class Empleado {
     public void actualizarEmpleados() throws SQLException {
         String sql = "UPDATE empleado Set cedula=?,nombres=?,apellidos=?,cargo=?,telefono=?,email=?,direccion=?,salario=? WHERE id_empleado=?";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
-            pstm.setInt(1, getCi());
+            pstm.setString(1, getCi());
             pstm.setString(2, getNom());
             pstm.setString(3, getApe());
             pstm.setString(4, getCargo());
-            pstm.setInt(5, getTelf());
+            pstm.setString(5, getTelf());
             pstm.setString(6, getCorreo());
             pstm.setString(7, getDire());
             pstm.setDouble(8, getSueldo());
@@ -128,14 +128,14 @@ public class Empleado {
     public void eliminarEmpleado() throws SQLException {
         String sql = "DELETE FROM empleado WHERE id_empleado=?";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
-            pstm.setInt(1, getCi());
+            pstm.setString(1, getCi());
             pstm.executeUpdate();
             System.out.println("Empleado dado de baja");
         }
     }
 
     public boolean empleadoExiste(String cedulaVerificar) throws SQLException {
-        String sql = "SELECT COUNT (*) as total FROM empleado WHERE cedula='" + cedulaVerificar + "'";
+        String sql = "SELECT COUNT(*) as total FROM empleado WHERE cedula='" + cedulaVerificar + "'";
         ResultSet rs = bd.consultarSQL(sql);
         if (rs.next()) {
             return rs.getInt("total") > 0;
@@ -171,5 +171,9 @@ public class Empleado {
 
     public void setIdEmpleado(int idEmpleado) {
         this.idEmpleado = idEmpleado;
+    }
+
+    public ResultSet listarActivos() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

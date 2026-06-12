@@ -147,7 +147,7 @@ public class Proveedor {
     }
 
     public boolean rucExiste(String rucVerificar) throws SQLException {
-        String sql = "SELECT COUNT (*) as total FROM proveedor WHERE ruc = '" + rucVerificar + "'";
+        String sql = "SELECT COUNT(*) as total FROM proveedor WHERE ruc = '" + rucVerificar + "'";
         ResultSet rs = bd.consultarSQL(sql);
         if (rs.next()) {
             return rs.getInt("total") > 0;

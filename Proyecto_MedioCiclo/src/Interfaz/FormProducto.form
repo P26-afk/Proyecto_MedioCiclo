@@ -96,10 +96,10 @@
                       <Component id="TxtStockA" alignment="0" max="32767" attributes="0"/>
                       <Component id="TxtStockM" max="32767" attributes="0"/>
                       <Component id="TxtStockMa" max="32767" attributes="0"/>
-                      <Component id="TxtIdCatego" max="32767" attributes="0"/>
-                      <Component id="TxtIdProvee" max="32767" attributes="0"/>
                       <Component id="TxtBuscar" pref="212" max="32767" attributes="0"/>
                       <Component id="TxtProducto" alignment="0" max="32767" attributes="0"/>
+                      <Component id="CboCategoria" alignment="0" max="32767" attributes="0"/>
+                      <Component id="CboProveedor" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -154,14 +154,14 @@
                       <Component id="TxtStockMa" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel10" min="-2" max="-2" attributes="0"/>
-                      <Component id="TxtIdCatego" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="CboCategoria" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="TxtIdProvee" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="CboProveedor" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -288,14 +288,40 @@
         </Component>
         <Component class="javax.swing.JTextField" name="TxtStockMa">
         </Component>
-        <Component class="javax.swing.JTextField" name="TxtIdCatego">
-        </Component>
-        <Component class="javax.swing.JTextField" name="TxtIdProvee">
-        </Component>
         <Component class="javax.swing.JTextField" name="TxtBuscar">
           <Events>
             <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="TxtBuscarKeyReleased"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="CboCategoria">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="4">
+                <StringItem index="0" value="Item 1"/>
+                <StringItem index="1" value="Item 2"/>
+                <StringItem index="2" value="Item 3"/>
+                <StringItem index="3" value="Item 4"/>
+              </StringArray>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="CboProveedor">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="4">
+                <StringItem index="0" value="Item 1"/>
+                <StringItem index="1" value="Item 2"/>
+                <StringItem index="2" value="Item 3"/>
+                <StringItem index="3" value="Item 4"/>
+              </StringArray>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

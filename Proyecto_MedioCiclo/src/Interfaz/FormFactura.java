@@ -4,13 +4,47 @@
  */
 package Interfaz;
 
+import java.awt.Dimension;
+import java.awt.HeadlessException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
+import proyecto_mediociclo.Cliente;
+import proyecto_mediociclo.Empleado;
+import proyecto_mediociclo.FacturaDeta;
+import proyecto_mediociclo.Facturacion;
+import proyecto_mediociclo.Producto;
+
 /**
  *
  * @author Usuario
  */
 public class FormFactura extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormFactura.class.getName());
+    private DefaultTableModel modeloProductos;
+    private final Map<Integer, Double> preciosProductos = new HashMap<>();
+    private double subtotal = 0.0;
+    private final double IVA_PORCENTAJE = 0.12;
+    private int idClienteSeleccionado = 0;
+    private int idEmpleadoSeleccionado = 0;
+    private javax.swing.JButton btnBuscarEmpleado;
+    private javax.swing.JLabel lblNombreEmpleado;
+    private javax.swing.JTextField txtNombreEmpleado;
 
     /**
      * Creates new form FormFactura
@@ -18,6 +52,10 @@ public class FormFactura extends javax.swing.JFrame {
     public FormFactura() {
         initComponents();
         setLocationRelativeTo(null);
+        agregarComponentesEmpleado();
+        configurarFechaActual();
+        configurarTablaProductos();
+        calcularTotales();
     }
 
     /**
@@ -44,7 +82,7 @@ public class FormFactura extends javax.swing.JFrame {
         TxtFecha = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         BtnNuevo = new javax.swing.JButton();
-        TxtBuscar = new javax.swing.JButton();
+        BtnBuscar = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         TablaContenido = new javax.swing.JTable();
@@ -82,11 +120,14 @@ public class FormFactura extends javax.swing.JFrame {
         jLabel6.setText("Fecha");
 
         TxtFactura.setEditable(false);
-        TxtFactura.addActionListener(this::TxtFacturaActionPerformed);
 
         TxtNomCliente.setEditable(false);
 
-        TxtFecha.addActionListener(this::TxtFechaActionPerformed);
+        TxtIDEmpleado.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                TxtIDEmpleadoMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -157,9 +198,9 @@ public class FormFactura extends javax.swing.JFrame {
         BtnNuevo.setText("Nueva Factura");
         BtnNuevo.addActionListener(this::BtnNuevoActionPerformed);
 
-        TxtBuscar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        TxtBuscar.setText("Buscar Cliente");
-        TxtBuscar.addActionListener(this::TxtBuscarActionPerformed);
+        BtnBuscar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        BtnBuscar.setText("Buscar Cliente");
+        BtnBuscar.addActionListener(this::BtnBuscarActionPerformed);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -169,7 +210,7 @@ public class FormFactura extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(BtnNuevo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(TxtBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(BtnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -178,7 +219,7 @@ public class FormFactura extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(BtnNuevo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(TxtBuscar)
+                .addComponent(BtnBuscar)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -211,6 +252,7 @@ public class FormFactura extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        TablaContenido.addPropertyChangeListener(this::TablaContenidoPropertyChange);
         jScrollPane1.setViewportView(TablaContenido);
 
         BtnAgrProducto.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
@@ -219,6 +261,7 @@ public class FormFactura extends javax.swing.JFrame {
 
         BtnEliminarProducto.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         BtnEliminarProducto.setText("Eliminar Producto");
+        BtnEliminarProducto.addActionListener(this::BtnEliminarProductoActionPerformed);
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel8.setText("Subtotal");
@@ -232,10 +275,8 @@ public class FormFactura extends javax.swing.JFrame {
         TxtSubtotal.setEditable(false);
 
         TxtIVA.setEditable(false);
-        TxtIVA.addActionListener(this::TxtIVAActionPerformed);
 
         TxtTotal.setEditable(false);
-        TxtTotal.addActionListener(this::TxtTotalActionPerformed);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -344,33 +385,615 @@ public class FormFactura extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void TxtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TxtBuscarActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TxtBuscarActionPerformed
+    private void BtnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnBuscarActionPerformed
+        buscarClientePorCedula();
+    }//GEN-LAST:event_BtnBuscarActionPerformed
 
     private void BtnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnNuevoActionPerformed
-        // TODO add your handling code here:
+        limpiarCampos();
+        obtenerSiguienteId();
+        configurarFechaActual();
     }//GEN-LAST:event_BtnNuevoActionPerformed
 
-    private void TxtFechaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TxtFechaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TxtFechaActionPerformed
-
-    private void TxtFacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TxtFacturaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TxtFacturaActionPerformed
-
     private void BtnAgrProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnAgrProductoActionPerformed
-        // TODO add your handling code here:
+        try {
+            abrirSeleccionProductos();
+        } catch (Exception ex) {
+            Logger.getLogger(FormFactura.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_BtnAgrProductoActionPerformed
 
-    private void TxtTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TxtTotalActionPerformed
+    private void TxtIDEmpleadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TxtIDEmpleadoMouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_TxtTotalActionPerformed
+    }//GEN-LAST:event_TxtIDEmpleadoMouseClicked
 
-    private void TxtIVAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TxtIVAActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TxtIVAActionPerformed
+    private void BtnEliminarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnEliminarProductoActionPerformed
+        quitarProductoSeleccionado();
+    }//GEN-LAST:event_BtnEliminarProductoActionPerformed
+
+    private void TablaContenidoPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_TablaContenidoPropertyChange
+        if ("tableCellEditor".equals(evt.getPropertyName()) && !TablaContenido.isEditing()) {
+            actualizarSubtotalProducto();
+        }
+    }//GEN-LAST:event_TablaContenidoPropertyChange
+
+    private void configurarTablaProductos() {
+        modeloProductos = (DefaultTableModel) TablaContenido.getModel();
+        modeloProductos.setRowCount(0);
+    }
+
+    private void agregarComponentesEmpleado() {
+        btnBuscarEmpleado = new javax.swing.JButton("Buscar Empleado");
+        btnBuscarEmpleado.setFont(new java.awt.Font("Tahoma", 1, 12));
+        btnBuscarEmpleado.addActionListener(e -> {
+            try {
+                buscarEmpleado();
+            } catch (Exception ex) {
+                Logger.getLogger(FormFactura.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+
+        lblNombreEmpleado = new javax.swing.JLabel("Nombre Empleado:");
+        lblNombreEmpleado.setFont(new java.awt.Font("Tahoma", 1, 12));
+
+        txtNombreEmpleado = new javax.swing.JTextField();
+        txtNombreEmpleado.setEditable(false);
+        txtNombreEmpleado.setColumns(25);
+        javax.swing.JPanel panelEmpleado = new javax.swing.JPanel();
+        panelEmpleado.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        panelEmpleado.add(btnBuscarEmpleado);
+        TxtIDEmpleado.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    try {
+                        buscarEmpleado();
+                    } catch (Exception ex) {
+                        Logger.getLogger(FormFactura.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+
+        // Hacer el campo cédula cliente también seleccionable con doble clic
+        TxtCedulaCli.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    mostrarDialogoSeleccionCliente();
+                }
+            }
+        });
+
+        TxtIDEmpleado.setToolTipText("Doble clic para buscar empleado");
+        TxtCedulaCli.setToolTipText("Doble clic para buscar cliente");
+    }
+
+    private void buscarClientePorCedula() {
+        String cedula = TxtCedulaCli.getText().trim();
+
+        // Si hay texto, buscar directamente por cédula
+        if (!cedula.isEmpty()) {
+            try {
+                Cliente clienteBean = new Cliente();
+                ResultSet rs = clienteBean.buscaCI(cedula);
+                if (rs.next()) {
+                    idClienteSeleccionado = rs.getInt("id_cliente");
+                    TxtNomCliente.setText(rs.getString("nombres") + " " + rs.getString("apellidos"));
+                    return;
+                }
+            } catch (Exception e) {
+                // Si falla, abrir diálogo de búsqueda
+            }
+        }
+
+        // Mostrar diálogo de selección de clientes
+        mostrarDialogoSeleccionCliente();
+    }
+
+    private void mostrarDialogoSeleccionCliente() {
+        try {
+            Cliente clienteBean = new Cliente();
+            ResultSet rs = clienteBean.listarActivos();
+
+            // Crear modelo para la tabla
+            DefaultTableModel modelo = new DefaultTableModel(
+                    new Object[]{"ID", "Cédula", "Nombres", "Apellidos", "Teléfono"}, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            while (rs != null && rs.next()) {
+                modelo.addRow(new Object[]{
+                    rs.getInt("id_cliente"),
+                    rs.getString("cedula"),
+                    rs.getString("nombres"),
+                    rs.getString("apellidos"),
+                    rs.getString("telefono")
+                });
+            }
+
+            if (modelo.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "No hay clientes registrados");
+                return;
+            }
+
+            // Crear tabla y scroll
+            JTable tabla = new JTable(modelo);
+            tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            JScrollPane scrollPane = new JScrollPane(tabla);
+            scrollPane.setPreferredSize(new Dimension(550, 300));
+
+            // Mostrar diálogo
+            int opcion = JOptionPane.showConfirmDialog(
+                    this,
+                    scrollPane,
+                    "Seleccionar Cliente",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (opcion == JOptionPane.OK_OPTION && tabla.getSelectedRow() != -1) {
+                int fila = tabla.getSelectedRow();
+                idClienteSeleccionado = (int) modelo.getValueAt(fila, 0);
+                String cedula = (String) modelo.getValueAt(fila, 1);
+                String nombres = (String) modelo.getValueAt(fila, 2);
+                String apellidos = (String) modelo.getValueAt(fila, 3);
+
+                TxtCedulaCli.setText(cedula);
+                TxtNomCliente.setText(nombres + " " + apellidos);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar clientes: " + e.getMessage());
+        }
+    }
+
+    private void buscarEmpleado() throws Exception {
+        String idTexto = TxtIDEmpleado.getText().trim();
+
+        if (!idTexto.isEmpty()) {
+            try {
+                int id = Integer.parseInt(idTexto);
+                Empleado emp = new Empleado();
+                ResultSet rs = emp.buscarPorId(id);
+                if (rs.next()) {
+                    idEmpleadoSeleccionado = rs.getInt("id_empleado");
+                    return;
+                }
+            } catch (Exception e) {
+            }
+        }
+
+        // Mostrar diálogo de selección de empleados
+        mostrarDialogoSeleccionEmpleado();
+    }
+
+    private void mostrarDialogoSeleccionEmpleado() throws Exception {
+        try {
+            Empleado e = new Empleado();
+            ResultSet rs = e.listarActivos();
+
+            // Crear modelo para la tabla
+            DefaultTableModel modelo = new DefaultTableModel(
+                    new Object[]{"ID", "Cédula", "Nombres", "Apellidos", "Cargo"}, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            while (rs != null && rs.next()) {
+                modelo.addRow(new Object[]{
+                    rs.getInt("id_empleado"),
+                    rs.getString("cedula"),
+                    rs.getString("nombres"),
+                    rs.getString("apellidos"),
+                    rs.getString("cargo")
+                });
+            }
+
+            if (modelo.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "No hay empleados registrados");
+                return;
+            }
+
+            // Crear tabla y scroll
+            JTable tabla = new JTable(modelo);
+            tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            JScrollPane scrollPane = new JScrollPane(tabla);
+            scrollPane.setPreferredSize(new Dimension(550, 300));
+
+            // Mostrar diálogo
+            int opcion = JOptionPane.showConfirmDialog(
+                    this,
+                    scrollPane,
+                    "Seleccionar Empleado",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (opcion == JOptionPane.OK_OPTION && tabla.getSelectedRow() != -1) {
+                int fila = tabla.getSelectedRow();
+                idEmpleadoSeleccionado = (int) modelo.getValueAt(fila, 0);
+                String nombres = (String) modelo.getValueAt(fila, 2);
+                String apellidos = (String) modelo.getValueAt(fila, 3);
+
+                TxtIDEmpleado.setText(String.valueOf(idEmpleadoSeleccionado));
+                // Si tuvieras un campo txtNombreEmpleado, podrías poner el nombre aquí
+            }
+
+        } catch (HeadlessException | SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar empleados: " + e.getMessage());
+        }
+    }
+
+    private void abrirSeleccionProductos() throws Exception {
+        ResultSet rsProductos = null;
+        ResultSet rsDetalle = null;
+
+        try {
+            Producto productoBean = new Producto();
+            rsProductos = productoBean.listarTodos();
+
+            // Crear modelo para la tabla
+            DefaultTableModel modelo = new DefaultTableModel(new Object[]{"ID", "Nombre", "Precio"}, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false; // tabla solo lectura
+                }
+            };
+
+            while (rsProductos != null && rsProductos.next()) {
+                int id = rsProductos.getInt("id_producto");
+                String nombre = rsProductos.getString("nombre");
+                double precio = rsProductos.getDouble("precio_venta");
+                modelo.addRow(new Object[]{id, nombre, precio});
+            }
+
+            if (modelo.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "No hay productos disponibles");
+                return;
+            }
+
+            // Crear tabla y scroll
+            JTable tabla = new JTable(modelo);
+            tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            JScrollPane scrollPane = new JScrollPane(tabla);
+            scrollPane.setPreferredSize(new Dimension(500, 300));
+
+            // Mostrar diálogo personalizado
+            int opcion = JOptionPane.showConfirmDialog(
+                    this,
+                    scrollPane,
+                    "Seleccionar Producto",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (opcion == JOptionPane.OK_OPTION && tabla.getSelectedRow() != -1) {
+                int filaSeleccionada = tabla.getSelectedRow();
+                int idProducto = (int) modelo.getValueAt(filaSeleccionada, 0);
+
+                rsDetalle = productoBean.buscarPorID(idProducto);
+                if (rsDetalle != null && rsDetalle.next()) {
+                    String nombre = rsDetalle.getString("nombre");
+                    double precio = rsDetalle.getDouble("precio_venta");
+
+                    // Verificar duplicado
+                    boolean existe = false;
+                    for (int i = 0; i < modeloProductos.getRowCount(); i++) {
+                        if ((int) modeloProductos.getValueAt(i, 0) == idProducto) {
+                            existe = true;
+                            break;
+                        }
+                    }
+
+                    if (existe) {
+                        JOptionPane.showMessageDialog(this, "Este producto ya está en la factura");
+                    } else {
+                        preciosProductos.put(idProducto, precio);
+                        Object[] fila = {idProducto, nombre, precio, 1, precio};
+                        modeloProductos.addRow(fila);
+                        calcularTotales();
+                    }
+                }
+            }
+
+        } catch (HeadlessException | SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar productos: " + e.getMessage());
+        } finally {
+            try {
+                if (rsProductos != null) {
+                    rsProductos.close();
+                }
+                if (rsDetalle != null) {
+                    rsDetalle.close();
+                }
+            } catch (SQLException ex) {
+            }
+        }
+    }
+
+    private void quitarProductoSeleccionado() {
+        int fila = TablaContenido.getSelectedRow();
+        if (fila >= 0) {
+            int idProducto;
+            idProducto = (int) modeloProductos.getValueAt(fila, 0);
+            preciosProductos.remove(idProducto);
+            modeloProductos.removeRow(fila);
+            calcularTotales();
+        } else {
+            JOptionPane.showMessageDialog(this, "Seleccione un producto para quitar");
+        }
+    }
+
+    private void actualizarSubtotalProducto() {
+        int fila = TablaContenido.getSelectedRow();
+        if (fila >= 0) {
+            try {
+                int idProducto = (int) modeloProductos.getValueAt(fila, 0);
+                int cantidad = (int) modeloProductos.getValueAt(fila, 3);
+                double precio = preciosProductos.get(idProducto);
+                double subtotal = precio * cantidad;
+
+                modeloProductos.setValueAt(subtotal, fila, 4);
+                calcularTotales();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al actualizar: " + e.getMessage());
+            }
+        }
+    }
+
+    private void calcularTotales() {
+        subtotal = 0.0;
+
+        // Calcular subtotal sumando todos los productos
+        for (int i = 0; i < modeloProductos.getRowCount(); i++) {
+            double subtotalProducto = (double) modeloProductos.getValueAt(i, 4);
+            subtotal += subtotalProducto;
+        }
+//
+//        // Obtener descuento (si existe)
+//        double descuento = 0.0;
+//        try {
+//            descuento = Double.parseDouble(txtDescuento.getText());
+//        } catch (NumberFormatException e) {
+//            // Mantener 0 si no es número válido
+//        }
+
+        // Calcular IVA (12% del subtotal)
+        double iva = subtotal * IVA_PORCENTAJE;
+
+        // Calcular total (subtotal + IVA - descuento)
+        double total = subtotal + iva;
+
+        // Actualizar campos
+        TxtSubtotal.setText(String.format("%.2f", subtotal));
+        TxtIVA.setText(String.format("%.2f", iva));
+        TxtTotal.setText(String.format("%.2f", total));
+    }
+
+    private void obtenerSiguienteId() {
+        try {
+            Facturacion factura = new Facturacion();
+            TxtFactura.setText(String.valueOf(factura.obtenerSiguienteId()));
+            TxtFactura.setText(factura.generarNumeroFactura());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al obtener siguiente ID: " + e.getMessage());
+        }
+    }
+
+    private void limpiarCampos() {
+        TxtFactura.setText("");
+        TxtCedulaCli.setText("");
+        TxtNomCliente.setText("");
+        TxtIDEmpleado.setText("");
+        TxtFactura.setText("");
+        TxtFecha.setText("");
+        TxtSubtotal.setText("0.00");
+        TxtIVA.setText("0.00");
+        TxtTotal.setText("0.00");
+
+        modeloProductos.setRowCount(0);
+        preciosProductos.clear();
+        subtotal = 0.0;
+
+        idClienteSeleccionado = 0;
+        idEmpleadoSeleccionado = 0;
+    }
+
+    private void guardarFactura() {
+        try {
+            if (validarCampos()) {
+                // TODO: Implementar guardado en base de datos
+                // y generación de PDF
+
+                JOptionPane.showMessageDialog(this, "Factura guardada exitosamente");
+                limpiarCampos();
+            }
+        } catch (HeadlessException e) {
+            JOptionPane.showMessageDialog(this, "Error al guardar factura: " + e.getMessage());
+        }
+    }
+
+    private void actualizarFactura() {
+        try {
+            if (validarCampos() && !TxtFactura.getText().isEmpty()) {
+                // TODO: Implementar actualización en base de datos
+
+                JOptionPane.showMessageDialog(this, "Factura actualizada exitosamente");
+                limpiarCampos();
+            }
+        } catch (HeadlessException e) {
+            JOptionPane.showMessageDialog(this, "Error al actualizar factura: " + e.getMessage());
+        }
+    }
+
+    private void eliminarFactura() {
+        if (!TxtFactura.getText().isEmpty()) {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "¿Está seguro de eliminar esta factura?",
+                    "Confirmar eliminación",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    // TODO: Implementar eliminación en base de datos
+
+                    JOptionPane.showMessageDialog(this, "Factura eliminada exitosamente");
+                    limpiarCampos();
+                } catch (HeadlessException e) {
+                    JOptionPane.showMessageDialog(this, "Error al eliminar factura: " + e.getMessage());
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Seleccione una factura para eliminar");
+        }
+    }
+
+    private boolean validarCampos() {
+        if (TxtCedulaCli.getText().isEmpty()
+                || TxtNomCliente.getText().isEmpty()
+                || TxtIDEmpleado.getText().isEmpty()
+                || modeloProductos.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Complete todos los campos obligatorios");
+            return false;
+        }
+
+        try {
+            Integer.valueOf(TxtIDEmpleado.getText());
+//            Double.valueOf(txtDescuento.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Verifique que los campos numéricos tengan valores válidos");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void generarPDFFactura() throws IOException, Exception {
+        if (!validarCampos()) {
+            JOptionPane.showMessageDialog(this, "Complete todos los campos antes de imprimir");
+            return;
+        }
+
+        // Guardar la factura en la base de datos antes de imprimir
+        if (!guardarFacturaEnBD()) {
+            return; // Si falla el guardado, no continuar con la impresión
+        }
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar Factura PDF");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Archivos PDF", "txt"));
+        fileChooser.setSelectedFile(new java.io.File("Factura_" + TxtFactura.getText() + ".txt"));
+
+        if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String rutaArchivo = fileChooser.getSelectedFile().getAbsolutePath();
+            if (!rutaArchivo.toLowerCase().endsWith(".txt")) {
+                rutaArchivo += ".pdf";
+            }
+
+            try {
+                crearFacturaTxt(rutaArchivo);
+                JOptionPane.showMessageDialog(this, "Factura guardada e impresa exitosamente en:\n" + rutaArchivo);
+                limpiarCampos();
+                obtenerSiguienteId();
+                configurarFechaActual();
+            } catch (HeadlessException e) {
+                JOptionPane.showMessageDialog(this, "Error al generar PDF: " + e.getMessage());
+            }
+        }
+    }
+
+    private boolean guardarFacturaEnBD() throws Exception {
+        try {
+            // Crear factura
+            Facturacion factura = new Facturacion();
+            factura.setIdCliente(idClienteSeleccionado > 0 ? idClienteSeleccionado : 1);
+            factura.setIdEmpleado(idEmpleadoSeleccionado > 0 ? idEmpleadoSeleccionado : Integer.parseInt(TxtIDEmpleado.getText()));
+            factura.setNumeroFactura(TxtFactura.getText());
+            factura.setSubtotal(subtotal);
+            factura.setDescuento(0.0);
+            factura.setIva(subtotal * IVA_PORCENTAJE);
+            factura.setTotal(subtotal + (subtotal * IVA_PORCENTAJE));
+
+            // Insertar factura
+            factura.insertarFactura();
+
+            // Obtener el ID de la factura recién insertada
+            int idFactura = factura.obtenerSiguienteId() - 1;
+
+            // Insertar detalles de la factura
+            FacturaDeta detalle = new FacturaDeta();
+            for (int i = 0; i < modeloProductos.getRowCount(); i++) {
+                int idProducto = (int) modeloProductos.getValueAt(i, 0);
+                double precio = (double) modeloProductos.getValueAt(i, 2);
+                int cantidad = (int) modeloProductos.getValueAt(i, 3);
+                double subtotalProducto = (double) modeloProductos.getValueAt(i, 4);
+
+                detalle.setIdFactura(idFactura);
+                detalle.setIdProducto(idProducto);
+                detalle.setCantidad(cantidad);
+                detalle.setPrecioUnitario(precio);
+                detalle.setSubtotal(subtotalProducto);
+                detalle.insertarDetalle();
+            }
+
+            return true;
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Error al guardar factura en BD: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void crearFacturaTxt(String rutaArchivo) throws IOException {
+        try (PrintWriter writer = new PrintWriter(rutaArchivo)) {
+            writer.println("================================================================================");
+            writer.println("                                   FACTURA                                      ");
+            writer.println("================================================================================");
+            writer.println();
+
+            writer.printf("  Número de Factura: %-20s     Fecha: %s%n",
+                    TxtFactura.getText(), TxtFecha.getText());
+            writer.printf("  Cliente: %s%n", TxtNomCliente.getText());
+            writer.println();
+            writer.println("--------------------------------------------------------------------------------");
+
+            writer.println("  PRODUCTO                       CANTIDAD    PRECIO UNIT.    SUBTOTAL");
+            writer.println("--------------------------------------------------------------------------------");
+
+            DefaultTableModel modelo = (DefaultTableModel) TablaContenido.getModel();
+            for (int i = 0; i < modelo.getRowCount(); i++) {
+                String producto = modelo.getValueAt(i, 1).toString();
+                String precio = modelo.getValueAt(i, 2).toString();
+                String cantidad = modelo.getValueAt(i, 3).toString();
+                String subtotal = modelo.getValueAt(i, 4).toString();
+
+                writer.printf("  %-33s %5s %13s %12s%n",
+                        producto, cantidad, precio, subtotal);
+            }
+
+            writer.println("--------------------------------------------------------------------------------");
+            writer.println();
+            float total = (float) ((float) subtotal + (subtotal * IVA_PORCENTAJE));
+            writer.printf("                                             SUBTOTAL  : %12.2f%n", subtotal);
+            writer.printf("                                             IVA (12%%): %13.2f%n", subtotal * IVA_PORCENTAJE);
+            writer.printf("                                                  TOTAL: %12.2f%n", total);
+            writer.println();
+            writer.println("================================================================================");
+            writer.println("                    Gracias por su compra                                       ");
+            writer.println("================================================================================");
+        }
+    }
+
+    private void configurarFechaActual() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        TxtFecha.setText(sdf.format(new Date()));
+    }
 
     /**
      * @param args the command line arguments
@@ -399,11 +1022,11 @@ public class FormFactura extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnAgrProducto;
+    private javax.swing.JButton BtnBuscar;
     private javax.swing.JButton BtnEliminarProducto;
     private javax.swing.JButton BtnImprimir;
     private javax.swing.JButton BtnNuevo;
     private javax.swing.JTable TablaContenido;
-    private javax.swing.JButton TxtBuscar;
     private javax.swing.JTextField TxtCedulaCli;
     private javax.swing.JTextField TxtFactura;
     private javax.swing.JTextField TxtFecha;

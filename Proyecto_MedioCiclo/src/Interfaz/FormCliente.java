@@ -388,7 +388,7 @@ public class FormCliente extends javax.swing.JFrame {
             mostrarMensaje("Cliente agregado correctamente");
             cargarDatos();
             limpiarFormulario();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             mostrarError("Error al agregar cliente: " + e.getMessage());
         }
     }

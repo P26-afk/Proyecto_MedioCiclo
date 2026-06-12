@@ -109,7 +109,7 @@ public class Categoria {
     }
 
     public boolean existeCategoria(String nombre) throws SQLException {
-        String sql = "SELECT COUNT (*) as total FROM categoria WHERE nombre = '" + nombre + "'";
+        String sql = "SELECT COUNT(*) as total FROM categoria WHERE nombre = '" + nombre + "'";
         ResultSet rs = bd.consultarSQL(sql);
         if (rs.next()) {
             return rs.getInt("total") > 0;

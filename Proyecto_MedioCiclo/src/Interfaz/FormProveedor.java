@@ -315,6 +315,7 @@ public class FormProveedor extends javax.swing.JFrame {
     }
 
     private void nuevo() {
+        TxtNombre.setText("");
         TxTRuc.setText("");
         TxtExp.setText("");
         TxtTelf.setText("");
