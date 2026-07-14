@@ -97,25 +97,24 @@ public class FacturaDeta {
 
     //Esto funciona para agragar items a una factura
     public void insertarDetalle() throws SQLException {
-        //Calcular subtotal antes de insertar
         calcularSubtotal();
         String sql = "INSERT INTO detalle_factura (id_factura, id_producto, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
-            pstm.setInt(1, getIdProducto());
-            pstm.setInt(2, getCantidad());
-            pstm.setDouble(3, getPrecioUnitario());
-            pstm.setDouble(4, getSubtotal());
-            pstm.setInt(5, getIdDeatalle());
+            pstm.setInt(1, getIdFactura());
+            pstm.setInt(2, getIdProducto());
+            pstm.setInt(3, getCantidad());
+            pstm.setDouble(4, getPrecioUnitario());
+            pstm.setDouble(5, getSubtotal());
             pstm.executeUpdate();
             System.out.println("Item agregado a la factura exitosamente");
         }
     }
-    // Esto funciona para modificar items factura
 
+    // Esto funciona para modificar items factura
     public void actualizarDetalle() throws SQLException {
         calcularSubtotal();
 
-        String sql = "UPDATE detalle_factura SET id_producto=?, cantidad=?, precio_unitario=?, subtotal+? WHERE id_detalle=?";
+        String sql = "UPDATE detalle_factura SET id_producto=?, cantidad=?, precio_unitario=?, subtotal=? WHERE id_detalle=?";
         try (PreparedStatement pstm = bd.conexion.prepareStatement(sql)) {
             pstm.setInt(1, getIdProducto());
             pstm.setInt(2, getCantidad());
@@ -149,7 +148,7 @@ public class FacturaDeta {
 
     //Esto funciona para obtener el total de una factura sumando sus detelles
     public double calcularTotalFactura(int idFacturaBucar) throws SQLException {
-        String sql = "SELECT SUM(subtotal) as total FROM detalle_factura = ? " + idFacturaBucar;
+        String sql = "SELECT SUM(subtotal) as total FROM detalle_factura WHERE id_factura = " + idFacturaBucar;
         ResultSet rs = bd.consultarSQL(sql);
         if (rs.next() && rs.getObject("total") != null) {
             return rs.getDouble("total");
@@ -159,7 +158,7 @@ public class FacturaDeta {
 
     // Esto funciona para verificar stock antes de agregar el detalle 
     public boolean verificarStock(int idProductoVerificar, int cantidadRequerida) throws SQLException {
-        String sql = "SELECT stock_actuar FROM producto WHERE id_producto = " + idProductoVerificar;
+        String sql = "SELECT stock_actual FROM producto WHERE id_producto = " + idProductoVerificar;
         ResultSet rs = bd.consultarSQL(sql);
         if (rs.next()) {
             int stockDisponible = rs.getInt("stock_actual");
