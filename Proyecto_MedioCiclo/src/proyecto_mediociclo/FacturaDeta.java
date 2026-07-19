@@ -181,7 +181,7 @@ public class FacturaDeta {
     //Esto funciona para obtener productos mas vendidos
     public ResultSet productosTopVentas() throws SQLException {
         String sql = "SELECT p.nombre, p.codigo, SUM(df.cantidad) as total_vendido, SUM(df.subtotal) as total_ingresos "
-                + "FROM detalles_factura df "
+                + "FROM detalle_factura df "
                 + "INNER JOIN producto p ON df.id_producto = p.id_producto "
                 + "GROUP BY df.id_producto, p.nombre, p.codigo "
                 + "ORDER BY total_vendido DESC "
